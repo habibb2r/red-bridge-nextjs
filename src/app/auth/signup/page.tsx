@@ -56,11 +56,12 @@ export default function SignupPage() {
         </Card>
 
         {/* Info Note */}
-        <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-          <p className="text-sm text-amber-800">
-            <strong>Note:</strong> Hospital accounts require verification before activation. 
-            You&apos;ll receive an email once your account is approved.
-          </p>
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm font-medium text-blue-800 mb-2">API Integration:</p>
+          <div className="text-xs text-blue-700">
+            <div>Connected to: http://localhost:5000/api</div>
+            <div>Endpoint: /auth/signup</div>
+          </div>
         </div>
       </div>
     </div>

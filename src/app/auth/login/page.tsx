@@ -49,13 +49,12 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Demo Credentials */}
+        {/* Info Note */}
         <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm font-medium text-blue-800 mb-2">Demo Credentials:</p>
-          <div className="text-xs text-blue-700 space-y-1">
-            <div><strong>Admin:</strong> admin@redbridge.com / admin123</div>
-            <div><strong>Hospital:</strong> hospital@example.com / hospital123</div>
-            <div><strong>User:</strong> user@example.com / user123</div>
+          <p className="text-sm font-medium text-blue-800 mb-2">API Integration:</p>
+          <div className="text-xs text-blue-700">
+            <div>Connected to: http://localhost:5000/api</div>
+            <div>Endpoint: /auth/login</div>
           </div>
         </div>
       </div>

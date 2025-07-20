@@ -21,7 +21,7 @@ const signupSchema = z.object({
   role: z.enum(['user', 'hospital'], {
     message: 'Please select a role',
   }),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
   agreeToTerms: z.boolean().refine((val) => val === true, {
     message: 'You must agree to the terms and conditions',
   }),
@@ -94,16 +94,16 @@ export function SignupForm({ onSignup, loading = false, error }: SignupFormProps
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
+        <Label htmlFor="phoneNumber">Phone Number</Label>
         <Input
-          id="phone"
+          id="phoneNumber"
           type="tel"
           placeholder="Enter your phone number"
-          {...register('phone')}
+          {...register('phoneNumber')}
           className="w-full"
         />
-        {errors.phone && (
-          <p className="text-sm text-red-500">{errors.phone.message}</p>
+        {errors.phoneNumber && (
+          <p className="text-sm text-red-500">{errors.phoneNumber.message}</p>
         )}
       </div>
 

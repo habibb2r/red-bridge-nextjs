@@ -2,15 +2,16 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import apiService, { LoginResponse } from '@/lib/api'
 
 export type UserRole = 'user' | 'hospital' | 'admin'
 
 export interface User {
-  id: string
+  _id: string
   name: string
   email: string
   role: UserRole
-  phone?: string
+  phoneNumber?: string
 }
 
 interface AuthContextType {
@@ -21,8 +22,8 @@ interface AuthContextType {
     name: string
     email: string
     password: string
-    role: UserRole
-    phone: string
+    role: 'user' | 'hospital'
+    phoneNumber: string
   }) => Promise<void>
   logout: () => void
   forgotPassword: (email: string) => Promise<void>
@@ -42,12 +43,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Check for stored auth data on mount
     const storedUser = localStorage.getItem('user')
-    if (storedUser) {
+    const storedToken = localStorage.getItem('token')
+    
+    if (storedUser && storedToken) {
       try {
-        setUser(JSON.parse(storedUser))
+        const userData = JSON.parse(storedUser)
+        setUser(userData)
+        
+        // Optionally verify token with backend
+        apiService.getProfile().then((response) => {
+          if (response.success && response.data) {
+            setUser(response.data)
+          } else {
+            // Token might be invalid, clear storage
+            localStorage.removeItem('user')
+            localStorage.removeItem('token')
+          }
+        }).catch(() => {
+          // Error verifying token, clear storage
+          localStorage.removeItem('user')
+          localStorage.removeItem('token')
+        })
       } catch (error) {
         console.error('Error parsing stored user data:', error)
         localStorage.removeItem('user')
+        localStorage.removeItem('token')
       }
     }
     setLoading(false)
@@ -56,48 +76,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (email: string, password: string, rememberMe = false) => {
     setLoading(true)
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const response = await apiService.login({ email, password })
+      console.log('Login response:', response.data)
       
-      // Mock authentication logic
-      if (email === 'admin@redbridge.com' && password === 'admin123') {
-        const userData: User = {
-          id: '1',
-          name: 'Admin User',
-          email: email,
-          role: 'admin',
-        }
+      if (response.success && response.data) {
+        const { user: userData, token } = response.data
+        
         setUser(userData)
-        if (rememberMe) {
-          localStorage.setItem('user', JSON.stringify(userData))
+        
+        // Store auth data if remember me is checked or always store temporarily
+        localStorage.setItem('user', JSON.stringify(userData))
+        localStorage.setItem('token', token)
+        
+        // Redirect based on role
+        switch (userData.role) {
+          case 'admin':
+            router.push('/admin')
+            break
+          case 'hospital':
+            router.push('/hospital')
+            break
+          default:
+            router.push('/user')
+            break
         }
-        router.push('/admin')
-      } else if (email.includes('hospital') && password === 'hospital123') {
-        const userData: User = {
-          id: '2',
-          name: 'Hospital Admin',
-          email: email,
-          role: 'hospital',
-        }
-        setUser(userData)
-        if (rememberMe) {
-          localStorage.setItem('user', JSON.stringify(userData))
-        }
-        router.push('/hospital')
-      } else if (password === 'user123') {
-        const userData: User = {
-          id: '3',
-          name: 'John Doe',
-          email: email,
-          role: 'user',
-        }
-        setUser(userData)
-        if (rememberMe) {
-          localStorage.setItem('user', JSON.stringify(userData))
-        }
-        router.push('/user')
       } else {
-        throw new Error('Invalid email or password')
+        throw new Error(response.error || 'Login failed')
       }
     } catch (error) {
       throw error
@@ -110,29 +114,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     name: string
     email: string
     password: string
-    role: UserRole
-    phone: string
+    role: 'user' | 'hospital'
+    phoneNumber: string
   }) => {
     setLoading(true)
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const response = await apiService.signup(data)
       
-      // Mock signup logic
-      const userData: User = {
-        id: Date.now().toString(),
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        phone: data.phone,
+      if (response.success && response.data) {
+        const { user: userData, token } = response.data
+        
+        setUser(userData)
+        localStorage.setItem('user', JSON.stringify(userData))
+        localStorage.setItem('token', token)
+        
+        // Redirect based on role
+        const redirectPath = userData.role === 'hospital' ? '/hospital' : '/user'
+        router.push(redirectPath)
+      } else {
+        throw new Error(response.error || 'Signup failed')
       }
-      
-      setUser(userData)
-      localStorage.setItem('user', JSON.stringify(userData))
-      
-      // Redirect based on role
-      const redirectPath = data.role === 'hospital' ? '/hospital' : '/user'
-      router.push(redirectPath)
     } catch (error) {
       throw error
     } finally {
@@ -141,17 +142,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = () => {
+    // Call API logout if needed
+    apiService.logout().catch(() => {
+      // Continue with local logout even if API call fails
+    })
+    
     setUser(null)
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
     router.push('/')
   }
 
   const forgotPassword = async (email: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const response = await apiService.forgotPassword({ email })
     
-    // Mock forgot password logic
-    console.log('Password reset email sent to:', email)
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to send reset email')
+    }
   }
 
   const value = {

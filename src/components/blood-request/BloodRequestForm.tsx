@@ -7,8 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { BloodGroup, Urgency } from '@/types';
+import apiService from '@/lib/api';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface BloodRequestFormData {
   title: string;
@@ -21,8 +23,10 @@ interface BloodRequestFormData {
   location: string;
 }
 
-const BloodRequestForm = ({ onSubmit }: { onSubmit: (data: BloodRequestFormData) => void }) => {
+const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<BloodRequestFormData>({
     title: '',
     description: '',
@@ -37,7 +41,7 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit: (data: BloodRequestFormData)
   const bloodGroups: BloodGroup[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   const urgencyLevels: Urgency[] = ['Low', 'Medium', 'High', 'Critical'];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       formData.title &&
@@ -48,18 +52,56 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit: (data: BloodRequestFormData)
       formData.contactInfo &&
       formData.location
     ) {
-      onSubmit(formData as BloodRequestFormData & { bloodGroup: BloodGroup; urgency: Urgency });
-      setFormData({
-        title: '',
-        description: '',
-        bloodGroup: '',
-        quantity: 1,
-        urgency: '',
-        dateNeeded: '',
-        contactInfo: '',
-        location: '',
-      });
-      setIsOpen(false);
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Map urgency to lowercase for API
+        const urgencyMap: Record<Urgency, 'low' | 'medium' | 'high' | 'critical'> = {
+          'Low': 'low',
+          'Medium': 'medium', 
+          'High': 'high',
+          'Critical': 'critical'
+        };
+
+        const requestData = {
+          title: formData.title,
+          description: formData.description,
+          bloodGroup: formData.bloodGroup,
+          quantity: formData.quantity,
+          urgency: urgencyMap[formData.urgency as Urgency],
+          dateNeeded: formData.dateNeeded,
+          location: formData.location,
+          contactInfo: formData.contactInfo,
+          status: 'active' as const,
+        };
+
+        const response = await apiService.createBloodRequest(requestData);
+        
+        if (response.success) {
+          // Call optional callback
+          onSubmit?.(formData as BloodRequestFormData & { bloodGroup: BloodGroup; urgency: Urgency });
+          
+          // Reset form
+          setFormData({
+            title: '',
+            description: '',
+            bloodGroup: '',
+            quantity: 1,
+            urgency: '',
+            dateNeeded: '',
+            contactInfo: '',
+            location: '',
+          });
+          setIsOpen(false);
+        } else {
+          setError(response.error || 'Failed to create blood request');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -82,6 +124,13 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit: (data: BloodRequestFormData)
             Fill out the form below to request blood. Your request will be visible to potential donors.
           </DialogDescription>
         </DialogHeader>
+        
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -188,11 +237,12 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit: (data: BloodRequestFormData)
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={loading}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-red-500 hover:bg-red-600 shadow-lg">
-              Submit Request
+            <Button type="submit" className="bg-red-500 hover:bg-red-600 shadow-lg" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? 'Creating Request...' : 'Submit Request'}
             </Button>
           </div>
         </form>
