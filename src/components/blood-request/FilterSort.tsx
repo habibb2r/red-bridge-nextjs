@@ -15,7 +15,7 @@ interface FilterSortProps {
 export interface FilterOptions {
   bloodGroup?: BloodGroup;
   urgency?: Urgency;
-  location?: string;
+  address?: string;
   status?: 'open' | 'fulfilled' | 'cancelled';
 }
 

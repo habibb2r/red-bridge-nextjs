@@ -60,9 +60,9 @@ export default function Home() {
       filtered = filtered.filter(req => req.urgency === currentFilters.urgency);
     }
     
-    if (currentFilters.location) {
+    if (currentFilters.address) {
       filtered = filtered.filter(req => 
-        req.location.toLowerCase().includes(currentFilters.location!.toLowerCase())
+        req.address.toLowerCase().includes(currentFilters.address!.toLowerCase())
       );
     }
     
@@ -109,7 +109,7 @@ export default function Home() {
       requesterId: apiRequest.requestedBy._id,
       requesterName: apiRequest.requestedBy.name,
       contactInfo: apiRequest.requestedBy.email,
-      location: apiRequest.requestedBy.name, // Using requester name as location for now
+      address: apiRequest.address, // Using requester name as location for now
       createdAt: new Date(apiRequest.createdAt),
       status: apiRequest.status === 'rejected' ? 'cancelled' : apiRequest.status,
     };

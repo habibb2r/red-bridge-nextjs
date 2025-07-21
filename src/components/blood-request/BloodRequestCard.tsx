@@ -11,6 +11,7 @@ interface BloodRequestCardProps {
 }
 
 const BloodRequestCard = ({ request, onContact }: BloodRequestCardProps) => {
+    console.log('Rendering BloodRequestCard for request:', request);
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case 'Critical': return 'bg-red-500 hover:bg-red-600 text-white shadow-lg';
@@ -67,7 +68,7 @@ const BloodRequestCard = ({ request, onContact }: BloodRequestCardProps) => {
           </div>
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <MapPin className="h-4 w-4 text-green-500" />
-            <span>{request.location}</span>
+            <span>{request.address}</span>
           </div>
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <User className="h-4 w-4 text-purple-500" />

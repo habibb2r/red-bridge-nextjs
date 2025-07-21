@@ -13,6 +13,7 @@ interface ApiBloodRequest {
   };
   bloodGroup: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   quantity: number;
+  address: string;
   urgency: 'low' | 'medium' | 'high';
   status: 'open' | 'fulfilled' | 'rejected';
   dateNeeded: string;
@@ -46,6 +47,7 @@ export function transformBloodRequest(apiRequest: ApiBloodRequest): BloodRequest
     },
     bloodGroup: apiRequest.bloodGroup,
     quantity: apiRequest.quantity,
+    address: apiRequest.address,
     urgency: apiRequest.urgency,
     status: apiRequest.status,
     dateNeeded: apiRequest.dateNeeded,

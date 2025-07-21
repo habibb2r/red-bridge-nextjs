@@ -44,6 +44,7 @@ export interface BloodRequest {
   quantity: number;
   urgency: 'low' | 'medium' | 'high';
   status: 'open' | 'fulfilled' | 'rejected';
+  address: string;
   dateNeeded: string;
   responses?: Array<{
     _id: string;
@@ -173,7 +174,7 @@ class ApiService {
     console.log('Blood requests response:', response.data);
     
     // Transform the response data if needed
-    if (response.success && response.data) {
+    if (response.data.success && response.data.data) {
       const { transformBloodRequests } = await import('./transformers');
       const transformedData = transformBloodRequests(response.data.data as unknown[]);
       return {
@@ -181,7 +182,7 @@ class ApiService {
         data: transformedData,
       };
     }
-    
+
     return response as ApiResponse<BloodRequest[]>;
   }
 

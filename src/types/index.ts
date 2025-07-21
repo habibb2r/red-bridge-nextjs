@@ -15,7 +15,7 @@ export interface BloodRequest {
   requesterId: string;
   requesterName: string;
   contactInfo: string;
-  location: string;
+  address: string;
   createdAt: Date;
   status: 'open' | 'fulfilled' | 'cancelled';
 }
