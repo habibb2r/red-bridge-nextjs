@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
+import logo from '@/images/logo.png'
+import Image from 'next/image';
 
 const Header = () => {
   const pathname = usePathname();
@@ -59,8 +61,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <Heart className="h-8 w-8 text-red-500 group-hover:text-red-600 transition-colors" />
-            <span className="text-xl font-bold text-gray-800 group-hover:text-red-600 transition-colors">Red Bridge</span>
+            <Image src={logo} alt="Red Bridge Logo"  height={80} priority />
           </Link>
 
           {/* Desktop Navigation */}

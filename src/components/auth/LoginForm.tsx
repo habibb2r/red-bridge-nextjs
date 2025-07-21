@@ -42,21 +42,21 @@ export function LoginForm({ onLogin, loading = false, error }: LoginFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-black">
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email Address</Label>
+      <div className="space-y-2 ">
+        <Label  htmlFor="email">Email Address</Label>
         <Input
           id="email"
           type="email"
           placeholder="Enter your email"
           {...register('email')}
-          className="w-full"
+          className="w-full bg-white"
         />
         {errors.email && (
           <p className="text-sm text-red-500">{errors.email.message}</p>
@@ -70,7 +70,7 @@ export function LoginForm({ onLogin, loading = false, error }: LoginFormProps) {
           type="password"
           placeholder="Enter your password"
           {...register('password')}
-          className="w-full"
+          className="w-full bg-white"
         />
         {errors.password && (
           <p className="text-sm text-red-500">{errors.password.message}</p>
