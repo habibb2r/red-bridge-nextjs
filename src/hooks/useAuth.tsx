@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
@@ -7,7 +8,7 @@ import apiService, { LoginResponse } from '@/lib/api'
 export type UserRole = 'user' | 'hospital' | 'admin'
 
 export interface User {
-  _id: string
+  _id?: string
   name: string
   email: string
   role: UserRole
@@ -73,21 +74,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setLoading(false)
   }, [])
 
-  const login = async (email: string, password: string, rememberMe = false) => {
+  const login = async (email: string, password: string) => {
     setLoading(true)
     try {
-      const response = await apiService.login({ email, password })
-      console.log('Login response:', response.data)
-      
-      if (response.success && response.data) {
-        const { user: userData, token } = response.data
-        
+      const response = await apiService.login({ email, password });
+      console.log('Login response:', response)
+      const envelope: any = response.data;
+      if (response?.success && envelope?.data) {
+        const { user: userData, accessToken: token } = envelope.data;
+        console.log('User data:', userData)
         setUser(userData)
-        
-        // Store auth data if remember me is checked or always store temporarily
         localStorage.setItem('user', JSON.stringify(userData))
-        localStorage.setItem('token', token)
-        
+        // Set accessToken in cookie (expires in 7 days)
+        document.cookie = `accessToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict; secure`;
         // Redirect based on role
         switch (userData.role) {
           case 'admin':
@@ -120,14 +119,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setLoading(true)
     try {
       const response = await apiService.signup(data)
-      
-      if (response.success && response.data) {
-        const { user: userData, token } = response.data
-        
+      const envelope: any = response.data;
+      if (envelope?.success && envelope?.data) {
+        const { user: userData, token } = envelope.data;
         setUser(userData)
         localStorage.setItem('user', JSON.stringify(userData))
         localStorage.setItem('token', token)
-        
+        // Set accessToken in cookie (expires in 7 days)
+        document.cookie = `accessToken=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict; secure`;
         // Redirect based on role
         const redirectPath = userData.role === 'hospital' ? '/hospital' : '/user'
         router.push(redirectPath)
@@ -146,10 +145,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     apiService.logout().catch(() => {
       // Continue with local logout even if API call fails
     })
-    
     setUser(null)
     localStorage.removeItem('user')
     localStorage.removeItem('token')
+    // Remove accessToken cookie
+    document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
     router.push('/')
   }
 
@@ -164,7 +164,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const value = {
     user,
     loading,
-    login,
+  login,
     signup,
     logout,
     forgotPassword,
