@@ -112,7 +112,7 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center space-x-2 bg-white text-red-600 hover:bg-red-50 border-2 border-white hover:border-red-100 shadow-lg hover:shadow-xl transition-all duration-200">
+        <Button className="flex items-center space-x-2 bg-white text-red-600 hover:bg-red-50  transition-all duration-200">
           <Plus className="h-4 w-4" />
           <span>Create Blood Request</span>
         </Button>

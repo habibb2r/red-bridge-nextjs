@@ -170,20 +170,24 @@ class ApiService {
 
   // Blood requests endpoints
   async getBloodRequests(): Promise<ApiResponse<BloodRequest[]>> {
-    const response = await this.request<unknown[]>('/blood-requests/get-blood-requests');
-    console.log('Blood requests response:', response.data);
+    const response = await this.request<{ data: BloodRequest[], message: string, success: boolean }>('/blood-requests/get-blood-requests');
     
-    // Transform the response data if needed
-    if (response.data.success && response.data.data) {
-      const { transformBloodRequests } = await import('./transformers');
-      const transformedData = transformBloodRequests(response.data.data as unknown[]);
+    if (response.success && response.data) {
+      console.log('API Response:', response.data);
+      
+      // The API returns { data: [...], message: "...", success: true }
+      // So we need to extract the actual blood requests from response.data.data
       return {
         success: true,
-        data: transformedData,
+        data: response.data.data,
+        message: response.data.message
       };
     }
-
-    return response as ApiResponse<BloodRequest[]>;
+    
+    return {
+      success: false,
+      error: response.error || 'Failed to fetch blood requests'
+    };
   }
 
   async createBloodRequest(requestData: Partial<BloodRequest>): Promise<ApiResponse<BloodRequest>> {
