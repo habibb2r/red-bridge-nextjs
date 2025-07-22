@@ -92,15 +92,24 @@ export default function Home() {
       <section className="relative bg-gradient-to-r from-red-500 via-red-600 to-red-700 text-white py-24 overflow-hidden">
         {/* Animated floating blood drops background with framer-motion */}
         <div className="absolute inset-0 pointer-events-none z-0">
-          {[...Array(8)].map((_, i) => (
+          {[
+            { left: '12%', top: '10%', width: 22, height: 30, delay: 0 },
+            { left: '22%', top: '18%', width: 28, height: 32, delay: 0.7 },
+            { left: '32%', top: '8%', width: 26, height: 36, delay: 1.4 },
+            { left: '42%', top: '16%', width: 30, height: 28, delay: 2.1 },
+            { left: '52%', top: '12%', width: 24, height: 34, delay: 2.8 },
+            { left: '62%', top: '20%', width: 32, height: 30, delay: 3.5 },
+            { left: '72%', top: '9%', width: 20, height: 28, delay: 4.2 },
+            { left: '82%', top: '15%', width: 28, height: 32, delay: 4.9 },
+          ].map((drop, i) => (
             <motion.span
               key={i}
               className="absolute rounded-full bg-red-400/30"
               style={{
-                left: `${10 + i * 10}%`,
-                top: `${10 + (i % 2 === 0 ? 0 : 10)}%`,
-                width: `${18 + (i % 3) * 8}px`,
-                height: `${24 + (i % 4) * 8}px`,
+                left: drop.left,
+                top: drop.top,
+                width: drop.width,
+                height: drop.height,
                 filter: "blur(1.5px)",
               }}
               animate={{
@@ -111,7 +120,7 @@ export default function Home() {
               transition={{
                 duration: 4.5,
                 repeat: Infinity,
-                delay: i * 0.7,
+                delay: drop.delay,
                 ease: "easeInOut",
               }}
             />
@@ -292,7 +301,7 @@ export default function Home() {
 
           {/* Blood Requests Grid */}
           {!loading && !error && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {bloodRequests.filter((request) => request.urgency === "high")
                 .length > 0 ? (
                 bloodRequests

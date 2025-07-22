@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 import logo from '@/images/logo.png'
 import Image from 'next/image';
+import { BiDonateBlood } from "react-icons/bi";
 
 const Header = () => {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ const Header = () => {
   const getNavItems = () => {
     const baseItems = [
       { href: '/', label: 'Home', icon: Heart },
+      { href: '/blood-requests', label: 'Blood Requests', icon: BiDonateBlood  },
     ];
 
     if (!user) {
@@ -61,11 +63,11 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <Image src={logo} alt="Red Bridge Logo"  height={80} priority />
+            <Image src={logo} alt="Red Bridge Logo" className='h-[60px] md:h-[80px] max-w-max' priority />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -81,7 +83,7 @@ const Header = () => {
                         : "text-gray-600 hover:text-red-500 hover:bg-red-50"
                     )}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-5 w-5" />
                     <span>{item.label}</span>
                   </Button>
                 </Link>
@@ -120,7 +122,7 @@ const Header = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <Button 
               variant="ghost" 
               size="icon" 
@@ -138,7 +140,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100">
+          <div className="lg:hidden py-4 border-t border-gray-100">
             <div className="space-y-2">
               {navItems.map((item) => {
                 const Icon = item.icon;

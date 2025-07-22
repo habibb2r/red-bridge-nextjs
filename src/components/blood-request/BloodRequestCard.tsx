@@ -47,7 +47,7 @@ const BloodRequestCard = ({ request, onContact }: BloodRequestCardProps) => {
   };
 
   return (
-    <Card className="relative hover:shadow-xl transition-all duration-300 border-gray-200 bg-white flex flex-col justify-between">
+    <Card className="relative hover:shadow-xl transition-all duration-300 border-none bg-white flex flex-col justify-between">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="flex-1">
