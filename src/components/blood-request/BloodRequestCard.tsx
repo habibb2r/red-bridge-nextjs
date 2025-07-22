@@ -10,14 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Phone, User, Droplets } from "lucide-react";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 
 interface BloodRequestCardProps {
   request: BloodRequest;
   onContact?: (request: BloodRequest) => void;
 }
 
-const BloodRequestCard = ({ request, onContact }: BloodRequestCardProps) => {
+const BloodRequestCard = ({ request }: BloodRequestCardProps) => {
   const getUrgencyColor = (urgency: string) => {
     switch (urgency.toLowerCase()) {
       case "critical":
@@ -48,6 +48,7 @@ const BloodRequestCard = ({ request, onContact }: BloodRequestCardProps) => {
 
   return (
     <Card className="relative hover:shadow-xl transition-all duration-300 border-none bg-white flex flex-col justify-between">
+      <Toaster position="top-center" duration={5000} />
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="flex-1">
