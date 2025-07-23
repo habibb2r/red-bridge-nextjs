@@ -51,6 +51,14 @@ export default function Home() {
     );
   };
 
+  // Recent activity (last 5 by dateNeeded desc)
+  const recent = [...bloodRequests]
+    .sort(
+      (a, b) =>
+        new Date(b.dateNeeded).getTime() - new Date(a.dateNeeded).getTime()
+    )
+    .slice(0, 3);
+
   const handleNewRequest = () => {
     // Refresh the blood requests after a new one is created
     window.location.reload(); // Simple refresh for now
@@ -85,7 +93,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50">
+    <div className="min-h-screen bg-white">
       <Toaster position="top-center" duration={5000} />
 
       {/* Hero Section */}
@@ -93,14 +101,14 @@ export default function Home() {
         {/* Animated floating blood drops background with framer-motion */}
         <div className="absolute inset-0 pointer-events-none z-0">
           {[
-            { left: '12%', top: '10%', width: 22, height: 30, delay: 0 },
-            { left: '22%', top: '18%', width: 28, height: 32, delay: 0.7 },
-            { left: '32%', top: '8%', width: 26, height: 36, delay: 1.4 },
-            { left: '42%', top: '16%', width: 30, height: 28, delay: 2.1 },
-            { left: '52%', top: '12%', width: 24, height: 34, delay: 2.8 },
-            { left: '62%', top: '20%', width: 32, height: 30, delay: 3.5 },
-            { left: '72%', top: '9%', width: 20, height: 28, delay: 4.2 },
-            { left: '82%', top: '15%', width: 28, height: 32, delay: 4.9 },
+            { left: "12%", top: "10%", width: 22, height: 30, delay: 0 },
+            { left: "22%", top: "18%", width: 28, height: 32, delay: 0.7 },
+            { left: "32%", top: "8%", width: 26, height: 36, delay: 1.4 },
+            { left: "42%", top: "16%", width: 30, height: 28, delay: 2.1 },
+            { left: "52%", top: "12%", width: 24, height: 34, delay: 2.8 },
+            { left: "62%", top: "20%", width: 32, height: 30, delay: 3.5 },
+            { left: "72%", top: "9%", width: 20, height: 28, delay: 4.2 },
+            { left: "82%", top: "15%", width: 28, height: 32, delay: 4.9 },
           ].map((drop, i) => (
             <motion.span
               key={i}
@@ -155,7 +163,7 @@ export default function Home() {
                 ease: "easeInOut",
               }}
             >
-              <GiHeartBeats 
+              <GiHeartBeats
                 size={60}
                 color="#c79191"
                 style={{ stroke: "#fff", strokeWidth: 2 }}
@@ -238,11 +246,34 @@ export default function Home() {
               </motion.button>
             </div>
             {/* The form anchor for smooth scroll */}
-              <BloodRequestForm onSubmit={handleNewRequest} />
-        
+            <BloodRequestForm onSubmit={handleNewRequest} />
           </div>
         </div>
       </section>
+
+      {/* Recent Activity Section */}
+      <div className=" container mx-auto px-4 my-[5%]">
+        <h2 className="text-3xl font-bold text-black mb-3 flex items-center gap-2 justify-center">
+          <Heart className="w-10 h-10 text-red-500" /> Recent Activity
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {recent.length > 0 ? (
+            recent.map((req) => (
+              <motion.div
+                key={req._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="h-full"
+              >
+                <BloodRequestCard request={req} />
+              </motion.div>
+            ))
+          ) : (
+            <span className="text-gray-400">No recent activity.</span>
+          )}
+        </div>
+      </div>
 
       {/* Stats Section */}
       <section className="py-16 bg-white">
@@ -272,7 +303,7 @@ export default function Home() {
       </section>
 
       {/* Urgent Blood Requests Section */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 to-red-50">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">

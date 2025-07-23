@@ -89,10 +89,7 @@ const Page = () => {
   const fulfilled = bloodRequests.filter(r => r.status === "fulfilled").length;
   const closed = bloodRequests.filter(r => r.status === "rejected").length;
 
-  // Recent activity (last 5 by dateNeeded desc)
-  const recent = [...bloodRequests]
-    .sort((a, b) => new Date(b.dateNeeded).getTime() - new Date(a.dateNeeded).getTime())
-    .slice(0, 6);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50 py-8">
@@ -207,24 +204,7 @@ const Page = () => {
           </div>
         ) : (
           <div>
-            {/* Recent Activity Section */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-700 mb-3 flex items-center gap-2"><Heart className="w-5 h-5 text-red-500" /> Recent Activity</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {recent.length > 0 ? recent.map(req => (
-                  <motion.div
-                    key={req._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
-                    className="h-full"
-                  >
-                    <BloodRequestCard request={req} />
-                  </motion.div>
-                )) : <span className="text-gray-400">No recent activity.</span>}
-              </div>
-            </div>
-
+           
             {/* How to Respond Section */}
             <div className="mb-8 bg-white rounded-xl shadow p-6">
               <h2 className="text-xl font-bold text-gray-700 mb-2 flex items-center gap-2"><CheckCircle className="w-5 h-5 text-emerald-500" /> How to Respond</h2>

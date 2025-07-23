@@ -17,35 +17,48 @@ interface BloodRequestCardProps {
   onContact?: (request: BloodRequest) => void;
 }
 
-const BloodRequestCard = ({ request }: BloodRequestCardProps) => {
-  const getUrgencyColor = (urgency: string) => {
-    switch (urgency.toLowerCase()) {
-      case "critical":
-        return "bg-red-500 hover:bg-red-600 text-white shadow-lg";
-      case "high":
-        return "bg-orange-500 hover:bg-orange-600 text-white shadow-md";
-      case "medium":
-        return "bg-yellow-500 hover:bg-yellow-600 text-white shadow-md";
-      case "low":
-        return "bg-emerald-500 hover:bg-emerald-600 text-white shadow-md";
-      default:
-        return "bg-gray-500 hover:bg-gray-600 text-white";
-    }
-  };
+const getUrgencyLabel = (urgency: string) => {
+  switch (urgency.toLowerCase()) {
+    case "critical":
+    case "high":
+      return "Urgent";
+    case "medium":
+      return "Soon";
+    case "low":
+      return "Flexible";
+    default:
+      return urgency.charAt(0).toUpperCase() + urgency.slice(1);
+  }
+};
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "open":
-        return "bg-emerald-100 text-emerald-700 border border-emerald-200";
-      case "fulfilled":
-        return "bg-blue-100 text-blue-700 border border-blue-200";
-      case "rejected":
-        return "bg-gray-100 text-gray-700 border border-gray-200";
-      default:
-        return "bg-gray-100 text-gray-700 border border-gray-200";
-    }
-  };
+const getUrgencyColor = (urgency: string) => {
+  switch (urgency.toLowerCase()) {
+    case "critical":
+    case "high":
+      return "bg-red-500 animate-pulse text-white shadow-lg";
+    case "medium":
+      return "bg-orange-400 animate-bounce text-white shadow-md";
+    case "low":
+      return "bg-emerald-500 animate-fadein text-white shadow-md";
+    default:
+      return "bg-gray-500 text-white";
+  }
+};
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "open":
+      return "bg-emerald-100 text-emerald-700 border border-emerald-200";
+    case "fulfilled":
+      return "bg-blue-100 text-blue-700 border border-blue-200";
+    case "rejected":
+      return "bg-gray-100 text-gray-700 border border-gray-200";
+    default:
+      return "bg-gray-100 text-gray-700 border border-gray-200";
+  }
+};
+
+export default function BloodRequestCard({ request }: BloodRequestCardProps) {
   return (
     <Card className="relative hover:shadow-xl transition-all duration-300 border-none bg-white flex flex-col justify-between h-full">
       <Toaster position="top-center" duration={5000} />
@@ -61,11 +74,10 @@ const BloodRequestCard = ({ request }: BloodRequestCardProps) => {
           </div>
           <div className="flex flex-col space-y-2 ml-4">
             <Badge className={getUrgencyColor(request.urgency)}>
-              {request.urgency.charAt(0).toUpperCase() +
-                request.urgency.slice(1)}
+              {getUrgencyLabel(request.urgency)}
             </Badge>
             <Badge className={getStatusColor(request.status)}>
-              {request.status}
+              {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
             </Badge>
           </div>
         </div>
@@ -85,7 +97,6 @@ const BloodRequestCard = ({ request }: BloodRequestCardProps) => {
             </span>
           </div>
         </div>
-
         <div className="grid grid-cols-1 gap-2">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <Calendar className="h-4 w-4 text-blue-500" />
@@ -107,8 +118,9 @@ const BloodRequestCard = ({ request }: BloodRequestCardProps) => {
         <div className="pt-2 mx-5 mb-3">
           <Button
             onClick={() =>
-              toast.info(`Contact requester: ${request.requestedBy.name} 
-             Email: ${request.requestedBy.email}`)
+              toast.info(
+                `Contact requester: ${request.requestedBy.name} \nEmail: ${request.requestedBy.email}`
+              )
             }
             className="w-full bg-red-500 hover:bg-red-600 shadow-lg hover:shadow-xl transition-all duration-200"
           >
@@ -117,8 +129,19 @@ const BloodRequestCard = ({ request }: BloodRequestCardProps) => {
           </Button>
         </div>
       )}
+      <style jsx>{`
+        @keyframes fadein {
+          from {
+            opacity: 0.5;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        .animate-fadein {
+          animation: fadein 1.5s ease-in-out infinite alternate;
+        }
+      `}</style>
     </Card>
   );
-};
-
-export default BloodRequestCard;
+}

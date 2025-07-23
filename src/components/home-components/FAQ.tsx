@@ -47,7 +47,7 @@ const FAQ = () => {
     },
   ];
   return (
-    <section className="py-16 bg-gradient-to-r from-red-50 to-pink-100 border-t">
+    <section className="py-16">
       <div className="container mx-auto px-4 max-w-3xl">
         <h2 className="text-3xl font-bold text-black mb-6 text-center">
           Blood Donation FAQs
