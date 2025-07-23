@@ -47,7 +47,7 @@ const BloodRequestCard = ({ request }: BloodRequestCardProps) => {
   };
 
   return (
-    <Card className="relative hover:shadow-xl transition-all duration-300 border-none bg-white flex flex-col justify-between">
+    <Card className="relative hover:shadow-xl transition-all duration-300 border-none bg-white flex flex-col justify-between h-full">
       <Toaster position="top-center" duration={5000} />
       <CardHeader>
         <div className="flex justify-between items-start">

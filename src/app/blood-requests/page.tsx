@@ -6,14 +6,12 @@ import BloodRequestCard from "@/components/blood-request/BloodRequestCard";
 import { BloodRequest } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, X } from "lucide-react";
-
-
+import { Loader2, X, Users, Heart, CheckCircle, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const URGENCY_LEVELS = ["low", "medium", "high"];
-const STATUS_OPTIONS = ["open", "fulfilled", "closed"];
-
+const STATUS_OPTIONS = ["open", "fulfilled", "rejected"];
 const SORT_OPTIONS = [
   { value: "dateNeeded", label: "Date Needed" },
   { value: "urgency", label: "Urgency" },
@@ -35,7 +33,7 @@ const Page = () => {
     setFilters({ bloodGroup: "", urgency: "", status: "", search: "" });
     setSort("dateNeeded");
   };
-  // Fetch blood requests from API
+
   useEffect(() => {
     const fetchBloodRequests = async () => {
       try {
@@ -57,7 +55,6 @@ const Page = () => {
     };
     fetchBloodRequests();
   }, []);
-
 
   // Filtering and sorting
   const filtered = bloodRequests
@@ -86,12 +83,53 @@ const Page = () => {
       return 0;
     });
 
+  // Stats
+  const total = bloodRequests.length;
+  const open = bloodRequests.filter(r => r.status === "open").length;
+  const fulfilled = bloodRequests.filter(r => r.status === "fulfilled").length;
+  const closed = bloodRequests.filter(r => r.status === "rejected").length;
+
+  // Recent activity (last 5 by dateNeeded desc)
+  const recent = [...bloodRequests]
+    .sort((a, b) => new Date(b.dateNeeded).getTime() - new Date(a.dateNeeded).getTime())
+    .slice(0, 6);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50 py-8">
       <div className="container mx-auto px-4">
         <h1 className="text-3xl md:text-4xl font-bold text-red-700 mb-6 text-center">All Blood Requests</h1>
-        {/* Filters & Sorting */}
-        <div className="flex flex-col md:flex-row md:items-end gap-4 mb-8 bg-white/80 rounded-xl shadow p-4">
+
+        {/* Stats Section */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="flex flex-col items-center bg-white rounded-xl shadow p-4">
+            <Users className="w-7 h-7 text-blue-500 mb-1" />
+            <span className="text-2xl font-bold text-gray-800">{total}</span>
+            <span className="text-gray-500 text-sm">Total Requests</span>
+          </div>
+          <div className="flex flex-col items-center bg-white rounded-xl shadow p-4">
+            <AlertCircle className="w-7 h-7 text-red-500 mb-1" />
+            <span className="text-2xl font-bold text-gray-800">{open}</span>
+            <span className="text-gray-500 text-sm">Open</span>
+          </div>
+          <div className="flex flex-col items-center bg-white rounded-xl shadow p-4">
+            <CheckCircle className="w-7 h-7 text-emerald-500 mb-1" />
+            <span className="text-2xl font-bold text-gray-800">{fulfilled}</span>
+            <span className="text-gray-500 text-sm">Fulfilled</span>
+          </div>
+          <div className="flex flex-col items-center bg-white rounded-xl shadow p-4">
+            <Heart className="w-7 h-7 text-pink-500 mb-1" />
+            <span className="text-2xl font-bold text-gray-800">{closed}</span>
+            <span className="text-gray-500 text-sm">Closed</span>
+          </div>
+        </div>
+
+        {/* Sticky Filters & Sorting */}
+        <motion.div
+          className="flex flex-col md:flex-row md:items-end gap-4 mb-8 bg-white/80 rounded-xl shadow p-4 sticky top-2 z-20"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-black">
             <Select value={filters.bloodGroup} onValueChange={v => setFilters(f => ({ ...f, bloodGroup: v }))}>
               <SelectTrigger className="bg-white border border-red-200 rounded-lg">
@@ -154,7 +192,8 @@ const Page = () => {
               Clear
             </button>
           </div>
-        </div>
+        </motion.div>
+
         {/* Loading/Error State */}
         {loading ? (
           <div className="flex justify-center items-center py-16">
@@ -167,16 +206,67 @@ const Page = () => {
             <p>{error}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1  md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filtered.length > 0 ? (
-              filtered.map(request => (
-                <BloodRequestCard key={request._id} request={request} />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12">
-                <span className="text-2xl text-gray-400 font-semibold">No blood requests found.</span>
+          <div>
+            {/* Recent Activity Section */}
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-gray-700 mb-3 flex items-center gap-2"><Heart className="w-5 h-5 text-red-500" /> Recent Activity</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {recent.length > 0 ? recent.map(req => (
+                  <motion.div
+                    key={req._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                    className="h-full"
+                  >
+                    <BloodRequestCard request={req} />
+                  </motion.div>
+                )) : <span className="text-gray-400">No recent activity.</span>}
               </div>
-            )}
+            </div>
+
+            {/* How to Respond Section */}
+            <div className="mb-8 bg-white rounded-xl shadow p-6">
+              <h2 className="text-xl font-bold text-gray-700 mb-2 flex items-center gap-2"><CheckCircle className="w-5 h-5 text-emerald-500" /> How to Respond</h2>
+              <ul className="list-disc pl-6 text-gray-700 space-y-1">
+                <li>Review the request details and urgency before contacting.</li>
+                <li>Contact the requester only if you are eligible and available to donate.</li>
+                <li>Bring a valid ID and any required documents to the donation site.</li>
+                <li>Follow up with the requester or hospital after your donation.</li>
+                <li>Share the request with friends and family to help spread the word.</li>
+              </ul>
+            </div>
+
+            {/* Animated Blood Requests Grid */}
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: { transition: { staggerChildren: 0.07 } },
+              }}
+            >
+              <AnimatePresence>
+                {filtered.length > 0 ? (
+                  filtered.map(request => (
+                    <motion.div
+                      key={request._id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 30 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <BloodRequestCard request={request} />
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12">
+                    <span className="text-2xl text-gray-400 font-semibold">No blood requests found.</span>
+                  </div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
         )}
       </div>
