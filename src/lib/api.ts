@@ -98,7 +98,13 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    // Get JWT from cookies (accessToken)
+    let token: string | null = null;
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/(?:^|; )accessToken=([^;]*)/);
+      token = match ? decodeURIComponent(match[1]) : null;
+    }
 
     const config: RequestInit = {
       headers: {

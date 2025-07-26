@@ -1,53 +1,56 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Heart, User, Building2, Shield, LogOut, Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
-import { useState } from 'react';
-import logo from '@/images/logo.png'
-import Image from 'next/image';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Heart, User, Building2, Shield, LogOut, Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+import logo from "@/images/logo.png";
+import Image from "next/image";
 import { BiDonateBlood } from "react-icons/bi";
 
 const Header = () => {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  console.log("User in Header:", user);
+   if (loading) {
+      return " Loading...";
+    }
+console.log("User in Header after loading:", user);
   // Filter nav items based on user role
   const getNavItems = () => {
     const baseItems = [
-      { href: '/', label: 'Home', icon: Heart },
-      { href: '/blood-requests', label: 'Blood Requests', icon: BiDonateBlood  },
+      { href: "/", label: "Home", icon: Heart },
+      { href: "/blood-requests", label: "Blood Requests", icon: BiDonateBlood },
     ];
 
+   
     if (!user) {
       return baseItems;
     }
 
-    if (user.role === 'admin') {
+    if (user?.role === "admin") {
       return [
         ...baseItems,
-        { href: '/admin', label: 'Admin Panel', icon: Shield },
-        { href: '/user', label: 'User Portal', icon: User },
-        { href: '/hospital', label: 'Hospital Portal', icon: Building2 },
+        { href: "/admin", label: "Admin Panel", icon: Shield },
+        { href: "/user", label: "User Portal", icon: User },
+        { href: "/hospital", label: "Hospital Portal", icon: Building2 },
       ];
     }
 
-    if (user.role === 'hospital') {
+    if (user?.role === "hospital") {
       return [
         ...baseItems,
-        { href: '/hospital', label: 'Hospital Portal', icon: Building2 },
+        { href: "/hospital", label: "Hospital Portal", icon: Building2 },
       ];
     }
 
     // user role
-    return [
-      ...baseItems,
-      { href: '/user', label: 'User Portal', icon: User },
-    ];
+    return [...baseItems, { href: "/user", label: "User Portal", icon: User }];
   };
 
   const navItems = getNavItems();
@@ -63,7 +66,12 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <Image src={logo} alt="Red Bridge Logo" className='h-[60px] md:h-[80px] max-w-max' priority />
+            <Image
+              src={logo}
+              alt="Red Bridge Logo"
+              className="h-[60px] md:h-[80px] max-w-max"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -71,15 +79,15 @@ const Header = () => {
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-              
+
               return (
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant={isActive ? "default" : "ghost"}
                     className={cn(
                       "flex items-center space-x-2 transition-all duration-200",
-                      isActive 
-                        ? "bg-red-500 hover:bg-red-600 text-white shadow-md" 
+                      isActive
+                        ? "bg-red-500 hover:bg-red-600 text-white shadow-md"
                         : "text-gray-600 hover:text-red-500 hover:bg-red-50"
                     )}
                   >
@@ -108,7 +116,10 @@ const Header = () => {
             ) : (
               <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-200">
                 <Link href="/auth/login">
-                  <Button variant="ghost" className="text-gray-600 hover:text-red-500 hover:bg-red-50">
+                  <Button
+                    variant="ghost"
+                    className="text-gray-600 hover:text-red-500 hover:bg-red-50"
+                  >
                     Sign In
                   </Button>
                 </Link>
@@ -123,9 +134,9 @@ const Header = () => {
 
           {/* Mobile menu button */}
           <div className="lg:hidden">
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="text-gray-600 hover:text-red-500 hover:bg-red-50"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
@@ -145,15 +156,19 @@ const Header = () => {
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
-                
+
                 return (
-                  <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                     <Button
                       variant={isActive ? "default" : "ghost"}
                       className={cn(
                         "w-full justify-start space-x-2",
-                        isActive 
-                          ? "bg-red-500 hover:bg-red-600 text-white" 
+                        isActive
+                          ? "bg-red-500 hover:bg-red-600 text-white"
                           : "text-gray-600 hover:text-red-500 hover:bg-red-50"
                       )}
                     >
@@ -182,12 +197,21 @@ const Header = () => {
                   </>
                 ) : (
                   <>
-                    <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="ghost" className="w-full justify-start text-gray-600 hover:text-red-500 hover:bg-red-50">
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-gray-600 hover:text-red-500 hover:bg-red-50"
+                      >
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/auth/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link
+                      href="/auth/signup"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
                       <Button className="w-full justify-start bg-red-500 hover:bg-red-600 text-white">
                         Sign Up
                       </Button>
