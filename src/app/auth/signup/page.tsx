@@ -16,7 +16,7 @@ export default function SignupPage() {
     email: string
     password: string
     role: 'user' | 'hospital'
-    phone: string
+  phoneNumber: string
   }) => {
     try {
       setError(null)

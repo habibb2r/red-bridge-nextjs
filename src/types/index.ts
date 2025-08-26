@@ -16,6 +16,8 @@ export interface BloodRequest {
   requesterName: string;
   contactInfo: string;
   address: string;
+  // Some components use `location`; keep it optional for compatibility
+  location?: string;
   createdAt: Date;
   status: 'open' | 'fulfilled' | 'cancelled';
 }

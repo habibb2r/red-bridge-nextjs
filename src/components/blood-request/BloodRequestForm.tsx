@@ -57,12 +57,12 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
       setError(null);
       
       try {
-        // Map urgency to lowercase for API
-        const urgencyMap: Record<Urgency, 'low' | 'medium' | 'high' | 'critical'> = {
+        // Map urgency to lowercase for API; map Critical to 'high' since API supports low/medium/high
+        const urgencyMap: Record<Urgency, 'low' | 'medium' | 'high'> = {
           'Low': 'low',
-          'Medium': 'medium', 
+          'Medium': 'medium',
           'High': 'high',
-          'Critical': 'critical'
+          'Critical': 'high'
         };
 
         const requestData = {
@@ -72,9 +72,11 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
           quantity: formData.quantity,
           urgency: urgencyMap[formData.urgency as Urgency],
           dateNeeded: formData.dateNeeded,
-          location: formData.location,
+          // API expects `address` — use the form location as address
+          address: formData.location,
           contactInfo: formData.contactInfo,
-          status: 'active' as const,
+          // API status uses 'open'|'fulfilled'|'rejected'
+          status: 'open' as const,
         };
 
         const response = await apiService.createBloodRequest(requestData);
