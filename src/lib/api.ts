@@ -53,6 +53,12 @@ export interface BloodRequest {
   updatedAt: string;
 }
 
+export interface AiBloodRequest{
+  message: string;
+  requestedBy: string;
+  success?: boolean
+}
+
 export interface InventoryItem {
   id: string;
   bloodGroup: string;
@@ -144,7 +150,7 @@ class ApiService {
   }
 
   async signup(userData: SignupRequest): Promise<ApiResponse<LoginResponse>> {
-    return this.request<LoginResponse>('/auth/signup', {
+    return this.request<LoginResponse>('/user/create-user', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -198,6 +204,13 @@ class ApiService {
 
   async createBloodRequest(requestData: Partial<BloodRequest>): Promise<ApiResponse<BloodRequest>> {
     return this.request<BloodRequest>('/blood-requests', {
+      method: 'POST',
+      body: JSON.stringify(requestData),
+    });
+  }
+
+  async createBloodRequestWithAI(requestData: { message: string, requestedBy: string }): Promise<ApiResponse<AiBloodRequest>> {
+    return this.request<AiBloodRequest>('/ai/blood-request', {
       method: 'POST',
       body: JSON.stringify(requestData),
     });

@@ -12,6 +12,8 @@ import { Plus, Heart } from 'lucide-react';
 import { BloodGroup, Urgency } from '@/types';
 import apiService from '@/lib/api';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface BloodRequestFormData {
   title: string;
@@ -28,6 +30,7 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user, loading: userLoading } = useAuth();
   const [formData, setFormData] = useState<BloodRequestFormData>({
     title: '',
     description: '',
@@ -112,10 +115,28 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleCreateRequestClick = () => {
+    if (!user && !userLoading) {
+      toast.error('Please sign in to create a blood request', {
+        description: 'You need to be logged in to submit blood requests.',
+        action: {
+          label: 'Sign In',
+          onClick: () => {
+            // You can add navigation to login page here
+            window.location.href = '/auth/login';
+          },
+        },
+      });
+      return;
+    }
+    setIsOpen(true);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <motion.button
+          onClick={handleCreateRequestClick}
           className="flex items-center space-x-2 bg-white text-red-600 hover:bg-red-50 transition-all duration-200 px-4 py-2 rounded-full shadow-lg font-bold "
           whileHover={{ scale: 1.08, boxShadow: "0 0 0 2px #ef4444" }}
           whileTap={{ scale: 0.97 }}
@@ -128,14 +149,14 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
         </motion.button>
       </DialogTrigger>
       <AnimatePresence>
-        {isOpen && (
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-red-300 bg-white/95 shadow-2xl rounded-3xl p-0">
+        {isOpen && user && (
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-red-300 bg-white/95 shadow-2xl  p-0">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 120, damping: 16 }}
-              className="rounded-3xl overflow-hidden"
+              className="text-black overflow-hidden"
             >
               {/* Header */}
               <div className="flex items-center gap-3 justify-center bg-gradient-to-r from-red-500 via-red-600 to-red-700 py-6 px-6">
@@ -269,7 +290,7 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
                     </Button>
                     <motion.button
                       type="submit"
-                      className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-red-500 text-white font-bold text-lg shadow-lg hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400"
+                      className="inline-flex items-center gap-2 px-5 py-1 rounded-full bg-red-500 text-white font-bold text-lg shadow-lg hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400"
                       initial={{ scale: 0.95, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       whileHover={{ scale: 1.08 }}
@@ -286,7 +307,7 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
                           ease: "easeInOut",
                         }}
                       >
-                        <Heart className="w-6 h-6 text-white" />
+                        <Heart className="w-4 h-4 text-white" />
                       </motion.span>
                       {loading ? 'Creating Request...' : 'Submit Request'}
                     </motion.button>
@@ -296,6 +317,22 @@ const BloodRequestForm = ({ onSubmit }: { onSubmit?: (data: BloodRequestFormData
             </motion.div>
           </DialogContent>
         )}
+        {
+          isOpen && !user && !userLoading && (
+            <DialogContent className="max-w-md border-2 border-red-300 bg-white/95 shadow-2xl rounded-3xl p-6">
+              <h2 className="text-xl font-bold text-center mb-4">Please Sign In</h2>
+              <p className="text-gray-600 text-center mb-6">You need to be logged in to create blood requests.</p>
+              <div className="flex justify-center">
+                <Button 
+                  onClick={() => window.location.href = '/auth/login'}
+                  className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full"
+                >
+                  Sign In
+                </Button>
+              </div>
+            </DialogContent>
+          )
+        }
       </AnimatePresence>
     </Dialog>
   );

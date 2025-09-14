@@ -10,7 +10,7 @@ import {jwtDecode} from 'jwt-decode'
 export type UserRole = 'user' | 'hospital' | 'admin'
 
 export interface User {
-  _id?: string
+  id: string
   name: string
   email: string
   role: UserRole

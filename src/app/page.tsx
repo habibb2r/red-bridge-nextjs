@@ -14,12 +14,13 @@ import WhyDonateBlood from "@/components/home-components/WhyDonateBlood";
 import DonorStories from "@/components/home-components/DonorStories";
 import FAQ from "@/components/home-components/FAQ";
 import { GiHeartBeats } from "react-icons/gi";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+ 
   // Fetch blood requests from API
   useEffect(() => {
     const fetchBloodRequests = async () => {

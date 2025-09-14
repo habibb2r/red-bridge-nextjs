@@ -5,6 +5,8 @@ import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { AuthProvider } from "@/hooks/useAuth";
+import { Toaster } from "sonner";
+import AiAssistant from "@/components/layout/AiAssistant";
 
 
 const sansation = Sansation({
@@ -27,13 +29,16 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${sansation.variable} ${sansation.variable} antialiased min-h-screen flex flex-col`}
+        suppressHydrationWarning={true}
       >
         <AuthProvider>
           <Header />
+          <AiAssistant />
           <main className="flex-1">
             {children}
           </main>
           <Footer />
+          <Toaster position="top-center" duration={5000} />
         </AuthProvider>
       </body>
     </html>
