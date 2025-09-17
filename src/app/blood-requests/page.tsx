@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, X, Users, Heart, CheckCircle, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getBloodRequests } from "@/apiCollection/bloodrequestapi";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const URGENCY_LEVELS = ["low", "medium", "high"];
@@ -17,7 +18,7 @@ const SORT_OPTIONS = [
   { value: "urgency", label: "Urgency" },
 ];
 
-const Page = () => {
+const BloodRequestsPage = () => {
   const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +30,7 @@ const Page = () => {
   });
   const [sort, setSort] = useState("dateNeeded");
 
+
   const handleClear = () => {
     setFilters({ bloodGroup: "", urgency: "", status: "", search: "" });
     setSort("dateNeeded");
@@ -39,6 +41,8 @@ const Page = () => {
       try {
         setLoading(true);
         setError(null);
+          const data = await  getBloodRequests();
+         console.log("Fetched Blood Requests:", data);
         const response = await apiService.getBloodRequests();
         if (response.success && response.data) {
           setBloodRequests(response.data);
@@ -254,4 +258,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default BloodRequestsPage;
